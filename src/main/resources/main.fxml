@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane fx:id="root" prefHeight="400.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ua.pp.myshko.csvholder.app.Controller">
+   <center>
+        <TableView fx:id="table" editable="true" prefHeight="258.0" prefWidth="500.0" BorderPane.alignment="CENTER">
+            <columns>
+              <TableColumn fx:id="fileColumnName" editable="false" prefWidth="186.0" text="Column in file" />
+              <TableColumn fx:id="dbFieldName" editable="true" minWidth="0.0" prefWidth="195.0" text="Column in DB" />
+            </columns>
+        </TableView>
+   </center>
+   <top>
+      <HBox alignment="CENTER_LEFT" prefHeight="21.0" prefWidth="500.0">
+         <children>
+            <Label prefHeight="17.0" prefWidth="100.0" text="File name" />
+            <TextField fx:id="fileName" prefHeight="25.0" prefWidth="250.0" />
+             <Button mnemonicParsing="false" onAction="#handleSelectFileButtonAction" prefHeight="25.0" prefWidth="75.0" text="Select csv-file" />
+             <Button mnemonicParsing="false" onAction="#handleReadFileButtonAction" prefHeight="25.0" prefWidth="75.0" text="Re-read file header" textAlignment="CENTER" />
+         </children>
+      </HBox>
+   </top>
+   <bottom>
+      <VBox prefHeight="116.0" prefWidth="500.0" BorderPane.alignment="CENTER">
+         <children>
+            <HBox alignment="CENTER_LEFT" prefHeight="33.0" prefWidth="500.0">
+               <children>
+                  <Label prefHeight="25.0" prefWidth="100.0" text="Table name" />
+                  <ComboBox fx:id="tableName" editable="true" prefHeight="25.0" prefWidth="250.0" />
+                    <Button mnemonicParsing="false" onAction="#handleSaveDataButtonAction" prefHeight="25.0" prefWidth="150.0" text="Read file and Save data to DB" />
+               </children>
+            </HBox>
+            <TextArea fx:id="messageArea" editable="false" prefHeight="81.0" prefWidth="500.0" />
+         </children>
+      </VBox>
+   </bottom>
+</BorderPane>

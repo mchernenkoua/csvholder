@@ -1,0 +1,43 @@
+<hibernate-mapping>
+    <class entity-name="file1" schema = "public">
+        <id name="id"
+            type="long"
+            column="ID">
+            <generator class="sequence"/>
+        </id>
+
+        <property name="col1"
+                  column="col1"
+                  type="string"/>
+
+        <property name="col2"
+                  column="col2"
+                  type="string"/>
+
+        <property name="col3"
+                  column="col3"
+                  type="string"/>
+
+    </class>
+
+    <class entity-name="file2" schema = "public">
+        <id name="id"
+            type="long"
+            column="ID">
+            <generator class="sequence"/>
+        </id>
+
+        <property name="col1"
+                  column="col1"
+                  type="string"/>
+
+        <property name="col2"
+                  column="col2"
+                  type="string"/>
+
+        <property name="col3"
+                  column="col3"
+                  type="string"/>
+
+    </class>
+</hibernate-mapping>
