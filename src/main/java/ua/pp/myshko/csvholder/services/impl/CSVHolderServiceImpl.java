@@ -41,21 +41,16 @@ public class CSVHolderServiceImpl implements CSVHolderService {
                 .create();
 
         fdList = new ArrayList<>();
-        JsonReader reader = null;
-        try {
-            File file = new File(propertiesFileName);
-            if(file.exists()) {
-                reader = new JsonReader(new FileReader(file));
+        File file = new File(propertiesFileName);
+        if(file.exists()) {
+            try (
+                FileReader fileReader = new FileReader(file);
+                JsonReader reader = new JsonReader(fileReader);
+                    ) {
                 fdList = Arrays.asList(gson.fromJson(reader, FileDescription[].class));
+            } catch (IOException e) {
+                throw new CSVHolderException(e);
             }
-        } catch (IOException e) {
-            throw new CSVHolderException(e);
-        } finally {
-            try {
-                if (reader != null) {
-                    reader.close();
-                }
-            } catch (IOException e) {}
         }
     }
 
@@ -64,19 +59,13 @@ public class CSVHolderServiceImpl implements CSVHolderService {
 
         String json = gson.toJson(fdList);
 
-        BufferedWriter bw = null;
-        try {
-            bw = new BufferedWriter(new FileWriter(propertiesFileName));
+        try (
+            FileWriter fileWriter = new FileWriter(propertiesFileName);
+            BufferedWriter bw = new BufferedWriter(fileWriter);
+                ) {
             bw.write(json);
-            bw.close();
         } catch (IOException e) {
             throw new CSVHolderException(e);
-        } finally {
-            try {
-                if (bw != null) {
-                    bw.close();
-                }
-            } catch (IOException e) {}
         }
     }
 
@@ -97,22 +86,21 @@ public class CSVHolderServiceImpl implements CSVHolderService {
     @Override
     public List<String> readFileTitle(String filePath) throws CSVHolderException {
 
-        BufferedReader reader;
-        try {
-            reader = Files.newBufferedReader(Paths.get(filePath));
+        try (BufferedReader reader = Files.newBufferedReader(Paths.get(filePath))) {
+
+            return reader.lines().limit(HEADER_SIZE)
+                    .flatMap(line -> Stream.of(line.split(WORD_REGEXP)))
+                    .collect(Collectors.toList());
+
         } catch (IOException e) {
             throw new CSVHolderException(e);
         }
-        return reader.lines().limit(HEADER_SIZE)
-                .flatMap(line -> Stream.of(line.split(WORD_REGEXP)))
-                .collect(Collectors.toList());
     }
 
     @Override
     public void saveData(List<FileLine> fileLines, FileDescription fd) throws CSVHolderException {
 
-        try {
-            Session session = HibernateUtil.openSession();
+        try (Session session = HibernateUtil.openSession()) {
             Transaction transaction = session.beginTransaction();
 
             fileLines.forEach(fileLine -> {
@@ -128,7 +116,7 @@ public class CSVHolderServiceImpl implements CSVHolderService {
             });
 
             transaction.commit();
-            session.close();
+
         } catch (HibernateException e) {
             throw new CSVHolderException(e);
         }
@@ -137,16 +125,15 @@ public class CSVHolderServiceImpl implements CSVHolderService {
     @Override
     public List<FileLine> readData(String filePath) throws CSVHolderException {
 
-        BufferedReader reader;
-        try {
-            reader = Files.newBufferedReader(Paths.get(filePath));
+        try (BufferedReader reader = Files.newBufferedReader(Paths.get(filePath))) {
+
+            return reader.lines().skip(HEADER_SIZE)
+                    .map(line -> new FileLine(line.split(WORD_REGEXP)))
+                    .collect(Collectors.toList());
+
         } catch (IOException e) {
             throw new CSVHolderException(e);
         }
-        return reader.lines().skip(HEADER_SIZE)
-                .map(line -> new FileLine(line.split(WORD_REGEXP)))
-                .collect(Collectors.toList());
-
     }
 
     @Override
