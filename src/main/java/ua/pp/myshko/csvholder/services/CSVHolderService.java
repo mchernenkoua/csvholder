@@ -12,18 +12,7 @@ import java.util.List;
  */
 public interface CSVHolderService {
 
-    List<String> readFileTitle(String filePath) throws CSVHolderException;
+    FileDescription receiveFileDescription(String filePath) throws CSVHolderException;
 
-    List<FileLine> readData(String filePath) throws CSVHolderException;
-
-    FileDescription findFileDescription(String filePath);
-
-    Collection<? extends String> getTableList();
-
-    void saveData(List<FileLine> fileLines, FileDescription fd) throws CSVHolderException;
-
-    void saveMapping() throws CSVHolderException;
-
-    FileDescription addFileDescription(String filePath, List<ColumnMapping> columnList, String tableName);
-
+    void saveData(List<ColumnMapping> columnList, String filePath, String tableNameString) throws CSVHolderException;
 }

@@ -10,6 +10,7 @@ import javafx.stage.WindowEvent;
 import ua.pp.myshko.csvholder.services.impl.CSVHolderServiceImpl;
 
 import java.net.URL;
+import java.nio.file.Paths;
 
 /**
  * @author M. Chernenko
@@ -17,7 +18,7 @@ import java.net.URL;
 public class Main extends Application {
 
     public static final String FXML_LOCATION = "/main.fxml";
-    public static final String PROP_LOCATION = "/prop.json";
+    public static final String PROP_LOCATION = "testData/prop.json";
     public static final String APP_TITLE = "CSV holder";
 
     @Override
@@ -29,8 +30,10 @@ public class Main extends Application {
         initStage(primaryStage, root);
 
         Controller controller = fxmlLoader.getController();
+        controller.initController();
         CSVHolderServiceImpl csvHolderService = new CSVHolderServiceImpl();
-        csvHolderService.init(PROP_LOCATION);
+        String propFileName = Paths.get(PROP_LOCATION).toAbsolutePath().toString();
+        csvHolderService.init(propFileName);
         controller.setCsvHolderService(csvHolderService);
     }
 

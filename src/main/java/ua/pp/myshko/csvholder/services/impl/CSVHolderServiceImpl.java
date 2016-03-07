@@ -15,6 +15,7 @@ import ua.pp.myshko.csvholder.utils.HibernateUtil;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -25,12 +26,9 @@ import java.util.stream.Stream;
  */
 public class CSVHolderServiceImpl implements CSVHolderService {
 
-    private static final String WORD_REGEXP = ";";
-    public static final int HEADER_SIZE = 1;
-
     private Gson gson;
     private String propertiesFileName;
-    private List<FileDescription> fdList;
+    private Map<String, FileDescription> fdMap;
 
     public void init(String propertiesFileName) throws CSVHolderException {
 
@@ -40,29 +38,31 @@ public class CSVHolderServiceImpl implements CSVHolderService {
                 .setPrettyPrinting()
                 .create();
 
-        fdList = new ArrayList<>();
+        fdMap = new HashMap<>();
         File file = new File(propertiesFileName);
         if(file.exists()) {
             try (
                 FileReader fileReader = new FileReader(file);
                 JsonReader reader = new JsonReader(fileReader);
                     ) {
-                fdList = Arrays.asList(gson.fromJson(reader, FileDescription[].class));
+                FileDescription[] fdArray = gson.fromJson(reader, FileDescription[].class);
+                for(FileDescription fd : fdArray) {
+                    fdMap.put(fd.getFileName(), fd);
+                }
             } catch (IOException e) {
                 throw new CSVHolderException(e);
             }
         }
     }
 
-    @Override
     public void saveMapping() throws CSVHolderException {
 
-        String json = gson.toJson(fdList);
+        String json = gson.toJson(fdMap.values());
 
         try (
-            FileWriter fileWriter = new FileWriter(propertiesFileName);
-            BufferedWriter bw = new BufferedWriter(fileWriter);
-                ) {
+                FileWriter fileWriter = new FileWriter(propertiesFileName);
+                BufferedWriter bw = new BufferedWriter(fileWriter);
+        ) {
             bw.write(json);
         } catch (IOException e) {
             throw new CSVHolderException(e);
@@ -70,85 +70,22 @@ public class CSVHolderServiceImpl implements CSVHolderService {
     }
 
     @Override
-    public FileDescription addFileDescription(String filePath, List<ColumnMapping> columnList, String tableName) {
+    public FileDescription receiveFileDescription(String filePath) throws CSVHolderException {
 
-        FileDescription fd = findFileDescription(filePath);
-        if(fd == null) {
-            fd = new FileDescription();
-            fd.setFileName(filePath);
-            fdList.add(fd);
+        FileDescription fd = fdMap.get(filePath);
+        if (fd == null) {
+            fd = new FileDescription(filePath);
+            fd.init();
+            fdMap.put(filePath, fd);
         }
-        fd.setTableName(tableName);
-        fd.setColumns(new ArrayList<>(columnList));
+        fd.updateColumns();
         return fd;
     }
 
     @Override
-    public List<String> readFileTitle(String filePath) throws CSVHolderException {
-
-        try (BufferedReader reader = Files.newBufferedReader(Paths.get(filePath))) {
-
-            return reader.lines().limit(HEADER_SIZE)
-                    .flatMap(line -> Stream.of(line.split(WORD_REGEXP)))
-                    .collect(Collectors.toList());
-
-        } catch (IOException e) {
-            throw new CSVHolderException(e);
-        }
+    public void saveData(List<ColumnMapping> columnList, String filePath, String tableNameString) throws CSVHolderException {
+        saveMapping();
+        FileDescription fd = fdMap.get(filePath);
+        fd.saveFileDataToDB();
     }
-
-    @Override
-    public void saveData(List<FileLine> fileLines, FileDescription fd) throws CSVHolderException {
-
-        try (Session session = HibernateUtil.openSession()) {
-            Transaction transaction = session.beginTransaction();
-
-            fileLines.forEach(fileLine -> {
-                Map<String, String> values = new HashMap<>();
-                List<String> dataValues = fileLine.getDataValue();
-                dataValues.forEach(
-                        dataValue -> {
-                            int index = dataValues.indexOf(dataValue);
-                            String dbFieldName = fd.getDbFieldNameByIndex(index);
-                            values.put(dbFieldName, dataValue);
-                        });
-                session.saveOrUpdate(fd.getTableName(), values);
-            });
-
-            transaction.commit();
-
-        } catch (HibernateException e) {
-            throw new CSVHolderException(e);
-        }
-    }
-
-    @Override
-    public List<FileLine> readData(String filePath) throws CSVHolderException {
-
-        try (BufferedReader reader = Files.newBufferedReader(Paths.get(filePath))) {
-
-            return reader.lines().skip(HEADER_SIZE)
-                    .map(line -> new FileLine(line.split(WORD_REGEXP)))
-                    .collect(Collectors.toList());
-
-        } catch (IOException e) {
-            throw new CSVHolderException(e);
-        }
-    }
-
-    @Override
-    public FileDescription findFileDescription(String filePath) {
-        return fdList.stream()
-                .filter(fileDescription -> fileDescription.getFileName().equals(filePath))
-                .findFirst()
-                .orElse(null);
-    }
-
-    @Override
-    public Collection<? extends String> getTableList() {
-        return fdList.stream()
-                .map(FileDescription::getTableName)
-                .collect(Collectors.toList());
-    }
-
 }

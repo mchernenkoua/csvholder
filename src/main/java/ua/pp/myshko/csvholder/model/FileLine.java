@@ -1,28 +1,30 @@
 package ua.pp.myshko.csvholder.model;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author M. Chernenko
  */
 public class FileLine {
 
-    List<String> dataValue;
+    Map<String, String> dataValue;
 
-    public FileLine() {
+    public FileLine(String[] dataValue, List<String> columns) {
 
+        this.dataValue = new HashMap<>();
+        for (int i = 0; i < dataValue.length; i++) {
+            this.dataValue.put(columns.get(i), dataValue[i]);
+        }
     }
 
-    public FileLine(String[] dataValue) {
-        this.dataValue = Arrays.asList(dataValue);
+    public String getDataValue(String column) {
+        return dataValue.get(column);
     }
 
-    public List<String> getDataValue() {
+    public  Map<String, String> getDataValues() {
         return dataValue;
-    }
-
-    public void setDataValue(List<String> dataValue) {
-        this.dataValue = dataValue;
     }
 }
