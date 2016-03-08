@@ -37,6 +37,10 @@ public class FileDescription {
         columns = new LinkedHashMap<>();
     }
 
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
+    }
+
     public String getFileName() {
         return fileName;
     }
@@ -82,16 +86,18 @@ public class FileDescription {
 
         Path path = Paths.get(getFileName());
 
+        HibernateUtil.updateEntityMapping(this);
+
+        List<String> columnList = columns.values().stream()
+                .map(column -> column.getDbFieldName())
+                .collect(Collectors.toList());
+
         try (
             BufferedReader reader = Files.newBufferedReader(path);
             Session session = HibernateUtil.openSession();
                 ) {
 
             Transaction transaction = session.beginTransaction();
-
-            List<String> columnList = columns.values().stream()
-                    .map(column -> column.getDbFieldName())
-                    .collect(Collectors.toList());
 
             reader.lines().skip(HEADER_SIZE)
                     .map(line -> new FileLine(line.split(WORD_REGEXP), columnList))

@@ -6,6 +6,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.annotations.NamedEntityGraphDefinition;
+import ua.pp.myshko.csvholder.model.FileDescription;
 
 /**
  * @author M. Chernenko
@@ -34,4 +35,10 @@ public class HibernateUtil {
         getSessionFactory().close();
     }
 
+    public static void updateEntityMapping(FileDescription fileDescription) {
+        // TODO: read mapping.xml
+        // TODO: find fileDescription.tableName table
+        // TODO: check columns and update mapping.xml if needed
+        // TODO: close session factory
+    }
 }

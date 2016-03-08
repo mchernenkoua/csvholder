@@ -84,8 +84,9 @@ public class CSVHolderServiceImpl implements CSVHolderService {
 
     @Override
     public void saveData(List<ColumnMapping> columnList, String filePath, String tableNameString) throws CSVHolderException {
-        saveMapping();
         FileDescription fd = fdMap.get(filePath);
+        fd.setTableName(tableNameString);
+        saveMapping();
         fd.saveFileDataToDB();
     }
 }
