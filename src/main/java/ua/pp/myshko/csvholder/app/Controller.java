@@ -11,7 +11,7 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.FileChooser;
 import ua.pp.myshko.csvholder.model.ColumnMapping;
 import ua.pp.myshko.csvholder.model.FileDescription;
-import ua.pp.myshko.csvholder.services.CSVHolderException;
+import ua.pp.myshko.csvholder.CSVHolderException;
 import ua.pp.myshko.csvholder.services.CSVHolderService;
 
 import java.io.*;

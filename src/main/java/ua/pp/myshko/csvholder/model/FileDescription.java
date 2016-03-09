@@ -3,7 +3,7 @@ package ua.pp.myshko.csvholder.model;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import ua.pp.myshko.csvholder.services.CSVHolderException;
+import ua.pp.myshko.csvholder.CSVHolderException;
 import ua.pp.myshko.csvholder.utils.HibernateUtil;
 
 import java.io.BufferedReader;

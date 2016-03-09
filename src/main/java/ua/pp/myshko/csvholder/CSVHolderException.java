@@ -1,4 +1,4 @@
-package ua.pp.myshko.csvholder.services;
+package ua.pp.myshko.csvholder;
 
 import java.io.IOException;
 

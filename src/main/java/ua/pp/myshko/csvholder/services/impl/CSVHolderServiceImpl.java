@@ -3,23 +3,13 @@ package ua.pp.myshko.csvholder.services.impl;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 import ua.pp.myshko.csvholder.model.ColumnMapping;
 import ua.pp.myshko.csvholder.model.FileDescription;
-import ua.pp.myshko.csvholder.model.FileLine;
-import ua.pp.myshko.csvholder.services.CSVHolderException;
+import ua.pp.myshko.csvholder.CSVHolderException;
 import ua.pp.myshko.csvholder.services.CSVHolderService;
-import ua.pp.myshko.csvholder.utils.HibernateUtil;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author M. Chernenko
